@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:baselineAligned="false" android:orientation="vertical">
+
+	<LinearLayout android:id="@+id/linearLayout1"
+		android:orientation="vertical" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:layout_gravity="center_horizontal">
+
+		<TableLayout android:layout_width="fill_parent"
+			android:id="@+id/tableLayout1" android:layout_height="fill_parent">
+			<TableRow android:id="@+id/tableRow1" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_margin="10px">
+				<TextView android:text="@string/webserver" android:id="@+id/textView1"
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:paddingLeft="10px" android:textStyle="bold"
+					android:paddingRight="20px" android:layout_marginRight="5px">
+				</TextView>
+				<ToggleButton android:text="webserver" android:id="@+id/toggleButtonWebserver"
+					android:layout_height="wrap_content" android:layout_width="wrap_content">
+				</ToggleButton>
+			</TableRow>
+			<TableRow android:id="@+id/tableRow2" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_margin="10px">
+				<TextView android:text="SSH" android:id="@+id/textView2"
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:paddingLeft="10px" android:textStyle="bold"
+					android:paddingRight="20px" android:layout_marginRight="5px">
+				</TextView>
+				<ToggleButton android:text="ssh" android:id="@+id/toggleButtonSSH"
+					android:layout_height="wrap_content" android:layout_width="wrap_content">
+				</ToggleButton>
+			</TableRow>
+		</TableLayout>
+		
+	</LinearLayout>
+</LinearLayout>
