@@ -1,0 +1,21 @@
+**********************
+DroniX Extended Menu *
+**********************
+
+* Gestisci il Web Server di DroniX
+** Avvia e arresta il Web Server
+** Conosci l'IP del Web Server con un click
+
+* Gestisci il Server SSH di DroniX
+** Avvia e arresta il Server SSH
+** Conosci l'IP del Server SSH con un click
+
+English
+* Manage DroniX Web Server
+** Start / Stop your Web Server with one click
+** One click to know Web Server IP address
+
+* Manage Dronix SSH Server
+** Start / Stop SSH Server with one click
+** One click to know SSH Server IP address
+
