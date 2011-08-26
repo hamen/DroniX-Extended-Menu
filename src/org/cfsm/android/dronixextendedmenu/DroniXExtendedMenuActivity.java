@@ -1,12 +1,8 @@
 package org.cfsm.android.dronixextendedmenu;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
 
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.RootToolsException;
@@ -19,6 +15,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.format.Formatter;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,21 +25,16 @@ import android.widget.ToggleButton;
 
 public class DroniXExtendedMenuActivity extends Activity {
 	// Options menu
-	private static final int move2system = Menu.FIRST;
+	private static final int preferences = Menu.FIRST;
     private static final int about = Menu.FIRST + 1;
-//    private static final int scheduleBtnId = Menu.FIRST + 3;
-//    private static final int playBtnId = Menu.FIRST + 2;
-    private int group1Id = 1;
-    private int group2Id = 2;
-    
+
     private static final int DIALOG_ERROR_ID = 1;
     private static final int DIALOG_ABOUT = 2;
     private static final int DIALOG_SSH_STARTED = 3;
     private static final int DIALOG_WEBSERVER_STARTED = 4;
 
-    private static final int MOUNT_RO = 0;
-    private static final int MOUNT_RW = 1;
-    
+    SSH ssh = new SSH();
+    WebServer wbsr = new WebServer();
     
     /** Called when the activity is first created. */
     @Override
@@ -50,107 +42,104 @@ public class DroniXExtendedMenuActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-      
         // get webserver togglebutton and bind onClickListener
-        final ToggleButton webserver = (ToggleButton) findViewById(R.id.toggleButtonWebserver);
-        webserver.setOnClickListener(new OnClickListener() {
-        	@Override
-        	public void onClick(View view) {
-        		if(exec("/system/bin/ps").indexOf("mini_httpd") == -1){
-        			// start webserver and set togglebutton to true
-        			String[] str ={"su","-c","/system/xbin/mini_httpd -C /system/etc/mini-httpd.conf"};
-        			try {
-						Process p = Runtime.getRuntime().exec(str);
-						webserver.setChecked(true);
-						String ip = getWIFIip();
-			        	if (ip.compareTo("0.0.0.0") == 0)
-								ip = "localhost";
-			        	showDialog(DIALOG_WEBSERVER_STARTED);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-        			
+        final ToggleButton webserverTB = (ToggleButton) findViewById(R.id.toggleButtonWebserver);
+        webserverTB.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!WebServer.isRunning()) {
+                    // start webserver and set togglebutton to true
+                    int success = 0;
+                    try {
+                        success = wbsr.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (success > 0) {
+                        Log.i("START", "hash: " + success);
+                        webserverTB.setChecked(true);
+                        String ip = getWIFIip();
+                        if (ip.compareTo("0.0.0.0") == 0)
+                            ip = "localhost";
+                        showDialog(DIALOG_WEBSERVER_STARTED);
+                    } else {
+                        Toast.makeText(getBaseContext(), "!*ERROR*!", Toast.LENGTH_SHORT).show();
+                    }
+
+                } else {
+                    // stop webserver and set togglebutton to false
+                    try {
+                        wbsr.stop();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    webserverTB.setChecked(false);
+                    Toast.makeText(getBaseContext(), R.string.webserverStopped, Toast.LENGTH_SHORT).show();
                 }
-        		else if(exec("/system/bin/ps").indexOf("mini_httpd") > 0 ) {
-                	// stop webserver and set togglebutton to false
-        			String[] str ={"su","-c","/system/xbin/killall mini_httpd"};
-        			try {
-						Process p = Runtime.getRuntime().exec(str);
-						webserver.setChecked(false);
-	            		Toast.makeText(getBaseContext(), R.string.webserverStopped, Toast.LENGTH_SHORT).show();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-        			
-        		}
-        	}
-        	});
-     // get ssh togglebutton and bind onClickListener
-        final ToggleButton sshToggleB = (ToggleButton) findViewById(R.id.toggleButtonSSH);
-        sshToggleB.setOnClickListener(new OnClickListener() {
-        	@Override
-        	public void onClick(View view) {
-        		if(exec("/system/bin/ps").indexOf("dropbear") == -1){
-            		       			
-            		// start ssh and set togglebutton to true and show a dialog with connection data
-        			try {
-						RootTools.sendShell("/data/www/cgi-bin/ssh-on.cgi");
-						sshToggleB.setChecked(true);
-						showDialog(DIALOG_SSH_STARTED);
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					} catch (RootToolsException e) {
-						e.printStackTrace();
-					}
-        			
+            }
+        });
+        /* get ssh togglebutton and bind onClickListener */
+        final ToggleButton sshTB = (ToggleButton) findViewById(R.id.toggleButtonSSH);
+        sshTB.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!SSH.isRunning()) {
+                    /* start ssh and set togglebutton to true and show a dialog with connection data */
+                    try {
+                        RootTools.sendShell("/data/www/cgi-bin/ssh-on.cgi");
+                        sshTB.setChecked(true);
+                        showDialog(DIALOG_SSH_STARTED);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (RootToolsException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    // stop ssh and set togglebutton to false
+                    try {
+                        RootTools.sendShell("/data/www/cgi-bin/ssh-off.cgi");
+                        sshTB.setChecked(false);
+                        Toast.makeText(getBaseContext(), R.string.sshStopped, Toast.LENGTH_SHORT).show();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (RootToolsException e) {
+                        e.printStackTrace();
+                    }
+
                 }
-        		else if(exec("/system/bin/ps").indexOf("dropbear") > 0 ) {
-                	// stop ssh and set togglebutton to false
-        			try {
-						RootTools.sendShell("/data/www/cgi-bin/ssh-off.cgi");
-						sshToggleB.setChecked(false);
-	            		Toast.makeText(getBaseContext(), R.string.sshStopped, Toast.LENGTH_SHORT).show();
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					} catch (RootToolsException e) {
-						e.printStackTrace();
-					}
-        			
-        		}
-        	}
-        	});
+            }
+        });
         
         /* AT START TIME */
-        // check if webserver is running and set ToggleButton 
-        String psOutput = exec("/system/bin/ps");
-        if(psOutput.indexOf("/system/xbin/mini_httpd") > 0){
-        	String ip = getWIFIip();
-
-        	showDialog(DIALOG_WEBSERVER_STARTED);
-        	webserver.setChecked(true);
-        }
-        else {
-        	webserver.setChecked(false);
+        // check if webserver is running and set ToggleButton
+        if(WebServer.isRunning()){
+            String ip = getWIFIip();
+            showDialog(DIALOG_WEBSERVER_STARTED);
+        	webserverTB.setChecked(true);
+        } else {
+        	webserverTB.setChecked(false);
         }
         
-        // check is ssh is running and show connection data
-        if(psOutput.indexOf("dropbear") > 0){
-        	showDialog(DIALOG_SSH_STARTED);
-        	sshToggleB.setChecked(true);
-        }
-        else {
-        	sshToggleB.setChecked(false);
+        if (SSH.isRunning()) {
+            showDialog(DIALOG_SSH_STARTED);
+            sshTB.setChecked(true);
+        } else {
+            sshTB.setChecked(false);
         }
     }
     
     // Create Option menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(group1Id, move2system, move2system,"Move2System");
+        int group1Id = 1;
+        menu.add(group1Id, preferences, preferences,"Preferences");
+        int group2Id = 2;
         menu.add(group2Id, about, about, R.string.about);
         return super.onCreateOptionsMenu(menu);
     }
@@ -159,10 +148,9 @@ public class DroniXExtendedMenuActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
     	int id = item.getItemId();
     	switch (id) {
-    	case move2system:
+    	case preferences:
     		Toast.makeText(this, "Coming soon...", Toast.LENGTH_SHORT).show();
-    		setSSHpassword();
-    		return true;
+            return true;
     	case about:
     		showDialog(DIALOG_ABOUT);
     		return true;
@@ -183,7 +171,7 @@ public class DroniXExtendedMenuActivity extends Activity {
     		dialog = createConfirmDialog(dialogData);
     		break;
     	case DIALOG_SSH_STARTED:
-    		String password = getSSHpassword();
+    		String password = SSH.getPassword();
 			ip = getWIFIip();
 			connectionData = "username: root\n" +
 					"password: " + password + "\n" +
@@ -221,9 +209,8 @@ public class DroniXExtendedMenuActivity extends Activity {
 
 			}
 		});
-		AlertDialog alert = builder.create();
 
-		return alert;
+        return builder.create();
 	}
 
 	private Dialog createErrorDialog() {
@@ -231,14 +218,14 @@ public class DroniXExtendedMenuActivity extends Activity {
 	}
 
 	// Executes UNIX command.
-	private String exec(String command) {
+	public static String exec(String command) {
 		try {
 			Process process = Runtime.getRuntime().exec(command);
 			BufferedReader reader = new BufferedReader(
 					new InputStreamReader(process.getInputStream()));
 			int read;
 			char[] buffer = new char[4096];
-			StringBuffer output = new StringBuffer();
+            StringBuilder output = new StringBuilder();
 			while ((read = reader.read(buffer)) > 0) {
 				output.append(buffer, 0, read);
 			}
@@ -251,78 +238,13 @@ public class DroniXExtendedMenuActivity extends Activity {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	private String getSSHpassword() {
-		String password = null;
-		try {
-			BufferedReader passfile = new BufferedReader(new FileReader("/etc/ssh/passwd"));
-			password = passfile.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return password;
-	}
-	
+
 	private String getWIFIip() {
 		WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 		int ipAddress = wifiInfo.getIpAddress();
-		String ip = Formatter.formatIpAddress(ipAddress);
-		return ip;
-	}
-	
-	private void reMountSystem(int mode) throws IOException, InterruptedException, RootToolsException {
-		List<String> output;
-		
-		switch(mode) {
-		case MOUNT_RW:
-			output = RootTools.sendShell("/system/xbin/mount -o rw,remount -t yaffs2 /dev/block/mtdblock4 /system");
-		    break;
-		case MOUNT_RO:
-			output = RootTools.sendShell("/system/xbin/mount -o ro,remount -t yaffs2 /dev/block/mtdblock4 /system");
-			break;
-		}
-	}
-	
-	private void setSSHpasswordFileRW() throws IOException, InterruptedException, RootToolsException {
-		RootTools.sendShell("/system/xbin/chmod +rw /etc/ssh/passwd");
-	}
-	private void setSSHpasswordFileRO() throws IOException, InterruptedException, RootToolsException {
-		RootTools.sendShell("/system/xbin/chmod go-w /etc/ssh/passwd");
-	}
-	
-	private boolean setSSHpassword() {
-		String password = "hamen"; 
-		
-		String currentPassword = getSSHpassword();
-		try {
-			// remount /system rw and set /etc/ssh/passwd to rw to edit password
-			reMountSystem(MOUNT_RW);
-			setSSHpasswordFileRW();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		try {
-			// write the new password
-			BufferedWriter passFile = new BufferedWriter(new FileWriter("/etc/ssh/passwd"));
-			passFile.write(password);
-			passFile.close();
-			
-			// restore permission on /etc/ssh/passewd and remount /system ro
-			setSSHpasswordFileRO();
-			reMountSystem(MOUNT_RO);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (RootToolsException e) {
-			e.printStackTrace();
-		}
-		return true;
-	}
-	
+		return Formatter.formatIpAddress(ipAddress);
+    }
 }
 // /system/xbin/mount -o rw,remount -t yaffs2 /dev/block/mtdblock3 /system
 // /system/xbin/mount -o ro,remount -t yaffs2 /dev/block/mtdblock3 /system
