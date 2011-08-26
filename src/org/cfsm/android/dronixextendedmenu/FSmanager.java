@@ -28,4 +28,12 @@ class FSmanager {
 			break;
 		}
 	}
+
+    public void setSSHpasswordFileRW() throws IOException, InterruptedException, RootToolsException {
+		RootTools.sendShell("/system/xbin/chmod +rw /etc/ssh/passwd");
+    }
+
+    public void setSSHpasswordFileRO() throws IOException, InterruptedException, RootToolsException {
+		RootTools.sendShell("/system/xbin/chmod go-w /etc/ssh/passwd");
+	}
 }

@@ -1,13 +1,5 @@
 package org.cfsm.android.dronixextendedmenu;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.text.format.Formatter;
-
-import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.RootToolsException;
 
 import java.io.*;
@@ -18,7 +10,6 @@ import java.io.*;
  */
 class SSH {
     private String host;
-    private final String password;
     private final FSmanager fsm = new FSmanager();
 
     private static final int MOUNT_RO = 0;
@@ -45,7 +36,7 @@ class SSH {
 
     public SSH() {
         host = this.host;
-        password = SSH.getPassword();
+        String password = SSH.getPassword();
     }
 
     public static boolean isRunning() {
@@ -59,7 +50,7 @@ class SSH {
 		try {
 			// remount /system rw and set /etc/ssh/passwd to rw to edit password
 			fsm.reMountSystem(MOUNT_RW);
-			setSSHpasswordFileRW();
+			fsm.setSSHpasswordFileRW();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -71,7 +62,7 @@ class SSH {
 			passFile.close();
 
 			// restore permission on /etc/ssh/passewd and remount /system ro
-			setSSHpasswordFileRO();
+			fsm.setSSHpasswordFileRO();
 			fsm.reMountSystem(MOUNT_RO);
 
 		} catch (IOException e) {
@@ -84,10 +75,5 @@ class SSH {
 		return true;
 	}
 
-    private void setSSHpasswordFileRW() throws IOException, InterruptedException, RootToolsException {
-		RootTools.sendShell("/system/xbin/chmod +rw /etc/ssh/passwd");
-	}
-	private void setSSHpasswordFileRO() throws IOException, InterruptedException, RootToolsException {
-		RootTools.sendShell("/system/xbin/chmod go-w /etc/ssh/passwd");
-	}
+
 }
