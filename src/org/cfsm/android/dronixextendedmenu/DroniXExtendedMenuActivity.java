@@ -4,10 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.format.Formatter;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
@@ -213,6 +217,28 @@ public class DroniXExtendedMenuActivity extends Activity {
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 		int ipAddress = wifiInfo.getIpAddress();
 		return Formatter.formatIpAddress(ipAddress);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.edit_ssh_password:
+                Toast.makeText(getBaseContext(), "edit password", Toast.LENGTH_SHORT).show();
+                Intent myIntent = new Intent(DroniXExtendedMenuActivity.this, SSHpasswordChange.class);
+                DroniXExtendedMenuActivity.this.startActivity(myIntent);
+                return true;
+            case R.id.reset_ssh_password:
+                Toast.makeText(getBaseContext(), "reset password", Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
 // /system/xbin/mount -o rw,remount -t yaffs2 /dev/block/mtdblock3 /system
