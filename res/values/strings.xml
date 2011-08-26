@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">DroniX Extended Menu</string>
     <string name="webserver">Webserver</string>
-    <string name="move2system">Move app to /system/</string>
     <string name="about">About</string>
     <string name="webserverStarted">WebServer started</string>
     <string name="webserverStopped">Webserver stopped</string>

@@ -1,12 +1,5 @@
 package org.cfsm.android.dronixextendedmenu;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import com.stericson.RootTools.RootTools;
-import com.stericson.RootTools.RootToolsException;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -15,18 +8,18 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.format.Formatter;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import com.stericson.RootTools.RootTools;
+import com.stericson.RootTools.RootToolsException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class DroniXExtendedMenuActivity extends Activity {
-	// Options menu
-	private static final int preferences = Menu.FIRST;
-    private static final int about = Menu.FIRST + 1;
 
     private static final int DIALOG_ERROR_ID = 1;
     private static final int DIALOG_ABOUT = 2;
@@ -41,7 +34,7 @@ public class DroniXExtendedMenuActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
+
         // get webserver togglebutton and bind onClickListener
         final ToggleButton webserverTB = (ToggleButton) findViewById(R.id.toggleButtonWebserver);
         webserverTB.setOnClickListener(new OnClickListener() {
@@ -56,7 +49,6 @@ public class DroniXExtendedMenuActivity extends Activity {
                         e.printStackTrace();
                     }
                     if (success > 0) {
-                        Log.i("START", "hash: " + success);
                         webserverTB.setChecked(true);
                         String ip = getWIFIip();
                         if (ip.compareTo("0.0.0.0") == 0)
@@ -133,30 +125,7 @@ public class DroniXExtendedMenuActivity extends Activity {
             sshTB.setChecked(false);
         }
     }
-    
-    // Create Option menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        int group1Id = 1;
-        menu.add(group1Id, preferences, preferences,"Preferences");
-        int group2Id = 2;
-        menu.add(group2Id, about, about, R.string.about);
-        return super.onCreateOptionsMenu(menu);
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-    	int id = item.getItemId();
-    	switch (id) {
-    	case preferences:
-    		Toast.makeText(this, "Coming soon...", Toast.LENGTH_SHORT).show();
-            return true;
-    	case about:
-    		showDialog(DIALOG_ABOUT);
-    		return true;
-    	}
-    	return false;
-    }
+
     @Override
     protected Dialog onCreateDialog(int id) {
     	Dialog dialog;
