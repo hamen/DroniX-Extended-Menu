@@ -14,7 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.RootToolsException;
@@ -32,12 +31,14 @@ public class DroniXExtendedMenuActivity extends Activity {
 
     SSH ssh = new SSH();
     WebServer wbsr = new WebServer();
-    
+    DEMUtil alert;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        alert = new DEMUtil(this);
 
         // get webserver togglebutton and bind onClickListener
         final ToggleButton webserverTB = (ToggleButton) findViewById(R.id.toggleButtonWebserver);
@@ -59,7 +60,7 @@ public class DroniXExtendedMenuActivity extends Activity {
                             ip = "localhost";
                         showDialog(DIALOG_WEBSERVER_STARTED);
                     } else {
-                        Toast.makeText(getBaseContext(), "!*ERROR*!", Toast.LENGTH_SHORT).show();
+                        alert.ts("!*ERROR*!");
                     }
 
                 } else {
@@ -70,7 +71,7 @@ public class DroniXExtendedMenuActivity extends Activity {
                         e.printStackTrace();
                     }
                     webserverTB.setChecked(false);
-                    Toast.makeText(getBaseContext(), R.string.webserverStopped, Toast.LENGTH_SHORT).show();
+                    alert.ts(getString(R.string.webserverStopped));
                 }
             }
         });
@@ -98,8 +99,7 @@ public class DroniXExtendedMenuActivity extends Activity {
                     try {
                         RootTools.sendShell("/data/www/cgi-bin/ssh-off.cgi");
                         sshTB.setChecked(false);
-                        Toast.makeText(getBaseContext(), R.string.sshStopped, Toast.LENGTH_SHORT).show();
-
+                        alert.ts(getString(R.string.sshStopped));
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
@@ -229,12 +229,11 @@ public class DroniXExtendedMenuActivity extends Activity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.edit_ssh_password:
-                Toast.makeText(getBaseContext(), "edit password", Toast.LENGTH_SHORT).show();
                 Intent myIntent = new Intent(DroniXExtendedMenuActivity.this, SSHpasswordChange.class);
                 DroniXExtendedMenuActivity.this.startActivity(myIntent);
                 return true;
             case R.id.reset_ssh_password:
-                Toast.makeText(getBaseContext(), "reset password", Toast.LENGTH_SHORT).show();
+                alert.ts("RESET PASSWORD");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
