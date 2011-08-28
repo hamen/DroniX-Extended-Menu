@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/edit_ssh_password" android:title="Edit SSH Password" />
-    <item android:id="@+id/reset_ssh_password" android:title="Reset SSH Password" />
-    <item android:id="@+id/about" android:title="About" />
-    <item android:id="@+id/exit" android:title="Exit" />
+    <item android:id="@+id/ssh_password_change_menuitem" android:title="@string/ssh_password_change_menuitem" />
+    <item android:id="@+id/about" android:title="@string/about_menuitem" />
+    <item android:id="@+id/exit" android:title="@string/exit_menuitem" />
 </menu>

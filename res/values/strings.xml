@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">DroniX Extended Menu</string>
-    <string name="webserver">Webserver</string>
+    <string name="webserver">WebServer</string>
     <string name="about">About</string>
     <string name="webserverStarted">WebServer started</string>
     <string name="webserverStopped">Webserver stopped</string>
     <string name="sshStarted">SSH started</string>
     <string name="sshStopped">SSH stopped</string>
     <string name="createdBy">Created by Ivan Morgillo</string>
+    <string name="error">Something went wrong</string>
+
+    <!-- SSH password change activity -->
+    <string name="ssh_oldpassword_textview">Old SSH password</string>
+    <string name="ssh_newpassword_textview">New SSH password</string>
+    <string name="ssh_password_change_button">Change!</string>
+    <string name="ssh_password_reset_button">Reset!</string>
+    <string name="ssh_password_change_success">Password successfully changed to:</string>
+    <string name="ssh_password_notmatching">Password does not match</string>
+    <string name="ssh_password_empty">Empty fields?! Really!?</string>
+
+    <!-- Menu -->
+    <string name="ssh_password_change_menuitem">Change SSH password</string>
+    <string name="about_menuitem">About</string>
+    <string name="exit_menuitem">Exit</string>
 </resources>

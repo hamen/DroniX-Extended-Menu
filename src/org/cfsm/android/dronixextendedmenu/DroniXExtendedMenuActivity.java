@@ -18,9 +18,7 @@ import android.widget.ToggleButton;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.RootToolsException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class DroniXExtendedMenuActivity extends Activity {
 
@@ -29,8 +27,8 @@ public class DroniXExtendedMenuActivity extends Activity {
     private static final int DIALOG_SSH_STARTED = 3;
     private static final int DIALOG_WEBSERVER_STARTED = 4;
 
-    SSH ssh = new SSH();
-    WebServer wbsr = new WebServer();
+    SSH ssh ;
+    WebServer wbsr;
     DEMUtil alert;
 
     /** Called when the activity is first created. */
@@ -39,6 +37,8 @@ public class DroniXExtendedMenuActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         alert = new DEMUtil(this);
+        wbsr = new WebServer(this);
+        ssh = new SSH(this);
 
         // get webserver togglebutton and bind onClickListener
         final ToggleButton webserverTB = (ToggleButton) findViewById(R.id.toggleButtonWebserver);
@@ -58,7 +58,7 @@ public class DroniXExtendedMenuActivity extends Activity {
                         String ip = getWIFIip();
                         if (ip.compareTo("0.0.0.0") == 0)
                             ip = "localhost";
-                        showDialog(DIALOG_WEBSERVER_STARTED);
+                        wbsr.showInfos(ip);
                     } else {
                         alert.ts("!*ERROR*!");
                     }
@@ -84,8 +84,7 @@ public class DroniXExtendedMenuActivity extends Activity {
                     /* start ssh and set togglebutton to true and show a dialog with connection data */
                     try {
                         RootTools.sendShell("/data/www/cgi-bin/ssh-on.cgi");
-                        sshTB.setChecked(true);
-                        showDialog(DIALOG_SSH_STARTED);
+                        checkSSH(sshTB);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
@@ -115,18 +114,27 @@ public class DroniXExtendedMenuActivity extends Activity {
         /* AT START TIME */
         // check if webserver is running and set ToggleButton
         if(WebServer.isRunning()){
-            String ip = getWIFIip();
-            showDialog(DIALOG_WEBSERVER_STARTED);
-        	webserverTB.setChecked(true);
+            wbsr.showInfos(getWIFIip());
+            webserverTB.setChecked(true);
         } else {
         	webserverTB.setChecked(false);
         }
-        
+
+       checkSSH(sshTB);
+    }
+
+    private void checkSSH(ToggleButton b) {
         if (SSH.isRunning()) {
-            showDialog(DIALOG_SSH_STARTED);
-            sshTB.setChecked(true);
+            String password = SSH.getPassword();
+            String ip = getWIFIip();
+            String connectionData = "username: root\n" +
+                "password: " + password + "\n" +
+                "IP: " + ip;
+            String title =   getString(R.string.sshStarted);
+            ssh.showInfos(connectionData, title);
+            b.setChecked(true);
         } else {
-            sshTB.setChecked(false);
+            b.setChecked(false);
         }
     }
 
@@ -139,30 +147,8 @@ public class DroniXExtendedMenuActivity extends Activity {
     	case DIALOG_ERROR_ID:
     		dialog = createErrorDialog();
     		break;
-    	case DIALOG_ABOUT:
-    		String[] dialogData = {"About", getBaseContext().getString(R.string.createdBy)} ;
-    		dialog = createConfirmDialog(dialogData);
-    		break;
-    	case DIALOG_SSH_STARTED:
-    		String password = SSH.getPassword();
-			ip = getWIFIip();
-			connectionData = "username: root\n" +
-					"password: " + password + "\n" +
-					"IP: " + ip;
-			
-    		String[] dialogSSHstarted = {"SSH started", connectionData} ;
-    		dialog = createConfirmDialog(dialogSSHstarted);
-    		break;
-    	case DIALOG_WEBSERVER_STARTED:
-			ip = getWIFIip();
-        	if (ip.compareTo("0.0.0.0") == 0)
-				ip = "localhost";
-			connectionData = "IP: " + ip;
-			
-			String[] dialogWebServerStarted = {"Web Server started", connectionData} ;
-    		dialog = createConfirmDialog(dialogWebServerStarted);
-    		break;
-    	default:
+
+        default:
     		dialog = null;
     		break;
     	}
@@ -190,28 +176,6 @@ public class DroniXExtendedMenuActivity extends Activity {
 		return null;
 	}
 
-	// Executes UNIX command.
-	public static String exec(String command) {
-		try {
-			Process process = Runtime.getRuntime().exec(command);
-			BufferedReader reader = new BufferedReader(
-					new InputStreamReader(process.getInputStream()));
-			int read;
-			char[] buffer = new char[4096];
-            StringBuilder output = new StringBuilder();
-			while ((read = reader.read(buffer)) > 0) {
-				output.append(buffer, 0, read);
-			}
-			reader.close();
-			process.waitFor();
-			return output.toString();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	private String getWIFIip() {
 		WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
@@ -228,17 +192,15 @@ public class DroniXExtendedMenuActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.edit_ssh_password:
-                Intent myIntent = new Intent(DroniXExtendedMenuActivity.this, SSHpasswordChange.class);
-                DroniXExtendedMenuActivity.this.startActivity(myIntent);
+            case R.id.ssh_password_change_menuitem:
+                Intent ssh_password_change_intent = new Intent(DroniXExtendedMenuActivity.this, SSHpasswordChange.class);
+                DroniXExtendedMenuActivity.this.startActivity(ssh_password_change_intent);
                 return true;
-            case R.id.reset_ssh_password:
-                alert.ts("RESET PASSWORD");
+            case R.id.about:
+                alert.alertbox(getString(R.string.createdBy), "Author");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 }
-// /system/xbin/mount -o rw,remount -t yaffs2 /dev/block/mtdblock3 /system
-// /system/xbin/mount -o ro,remount -t yaffs2 /dev/block/mtdblock3 /system
