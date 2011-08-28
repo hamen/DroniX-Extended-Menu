@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ToggleButton;
-import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.RootToolsException;
 
 import java.io.IOException;
@@ -83,20 +82,20 @@ public class DroniXExtendedMenuActivity extends Activity {
                 if (!SSH.isRunning()) {
                     /* start ssh and set togglebutton to true and show a dialog with connection data */
                     try {
-                        RootTools.sendShell("/data/www/cgi-bin/ssh-on.cgi");
+                        ssh.start();
                         checkSSH(sshTB);
                     } catch (IOException e) {
                         e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     } catch (RootToolsException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
                 } else {
                     // stop ssh and set togglebutton to false
                     try {
-                        RootTools.sendShell("/data/www/cgi-bin/ssh-off.cgi");
+                        ssh.stop();
                         sshTB.setChecked(false);
                         alert.ts(getString(R.string.sshStopped));
                     } catch (IOException e) {

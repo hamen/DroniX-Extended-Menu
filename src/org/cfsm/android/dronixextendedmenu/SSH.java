@@ -3,6 +3,7 @@ package org.cfsm.android.dronixextendedmenu;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.RootToolsException;
 
 import java.io.*;
@@ -80,4 +81,25 @@ class SSH {
             });
             alertbox.show();
         }
+    public void start() throws IOException, RootToolsException, InterruptedException {
+        File old = new File("/data/www/cgi-bin/ssh-on.cgi");
+        if (old.exists()) {
+            /* Old environment detected */
+            RootTools.sendShell("/data/www/cgi-bin/ssh-on.cgi");
+        }
+        else {
+            RootTools.sendShell("/system/bin/ssh-on");
+        }
+    }
+
+    public void stop() throws IOException, RootToolsException, InterruptedException {
+        File old = new File("/data/www/cgi-bin/ssh-off.cgi");
+        if (old.exists()) {
+            /* Old environment detected */
+            RootTools.sendShell("/data/www/cgi-bin/ssh-off.cgi");
+        }
+        else {
+            RootTools.sendShell("/system/bin/ssh-off");
+        }
+    }
 }
