@@ -1,4 +1,4 @@
-package org.cfsm.android.dronixextendedmenu;
+package org.dronix.android.dronixextendedmenu;
 
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.RootToolsException;

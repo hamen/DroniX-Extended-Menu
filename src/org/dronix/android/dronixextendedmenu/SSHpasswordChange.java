@@ -1,4 +1,4 @@
-package org.cfsm.android.dronixextendedmenu;
+package org.dronix.android.dronixextendedmenu;
 
 import android.app.Activity;
 import android.os.Bundle;
