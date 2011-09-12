@@ -2,62 +2,75 @@ package org.dronix.android.dronixextendedmenu;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
+import com.stericson.RootTools.RootToolsException;
+
+import java.io.IOException;
 
 
 public class Preferences extends PreferenceActivity {
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-                super.onCreate(savedInstanceState);
-                addPreferencesFromResource(R.xml.preferences);
-/*            // Get the custom preference
-            Preference customPref = (Preference) findPreference("customPref");
-            customPref
-                .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-
-                    public boolean onPreferenceClick(Preference preference) {
-                        Toast.makeText(getBaseContext(),
-                            "The custom preference has been clicked",
-                            Toast.LENGTH_LONG).show();
-                        SharedPreferences customSharedPreference = getSharedPreferences(
-                            "myCustomSharedPrefs", Activity.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = customSharedPreference
-                            .edit();
-                        editor.putString("myCustomPref",
-                            "The preference has been clicked");
-                        editor.commit();
-                        return true;
-                    }
-
-                });*/
-        }
-
     boolean SSHCheckboxPreference;
     boolean WebServerCheckboxPreference;
+    SSH ssh = new SSH(this);
 
-    String ListPreference;
-        String editTextPreference;
-        String ringtonePreference;
-        String secondEditTextPreference;
-        String customPref;
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.preferences);
 
-        private void getPrefs() {
-            // Get the xml/preferences.xml preferences
-            SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(getBaseContext());
-            SSHCheckboxPreference = prefs.getBoolean("ssh_checkbox_preference", true);
-            WebServerCheckboxPreference = prefs.getBoolean("webserver_checkbox_preference", true);
-/*                ListPreference = prefs.getString("listPref", "nr1");
-                editTextPreference = prefs.getString("editTextPref",
-                                "Nothing has been entered");
-                ringtonePreference = prefs.getString("ringtonePref",
-                                "DEFAULT_RINGTONE_URI");
-                secondEditTextPreference = prefs.getString("SecondEditTextPref",
-                                "Nothing has been entered");
-                // Get the custom preference
-                SharedPreferences mySharedPreferences = getSharedPreferences(
-                                "myCustomSharedPrefs", Activity.MODE_PRIVATE);
-                customPref = mySharedPreferences.getString("myCusomPref", "");*/
+            final CheckBoxPreference checkboxPref = (CheckBoxPreference) getPreferenceManager()
+                .findPreference("ssh_checkbox_preference");
+
+            checkboxPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if (newValue.toString().equals("true") && !SSH.isRunning()) {
+                        try {
+                            ssh.start();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (RootToolsException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        if (SSH.isRunning()) {
+                            Toast.makeText(getApplicationContext(),
+                                getText(R.string.sshStarted),
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else {
+                        try {
+                            ssh.stop();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (RootToolsException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        if (!SSH.isRunning()) {
+                            Toast.makeText(getApplicationContext(),
+                                getText(R.string.sshStopped),
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    return true;
+                }
+
+            });
         }
+
+    private void getPrefs() {
+        // Get the xml/preferences.xml preferences
+        SharedPreferences prefs = PreferenceManager
+            .getDefaultSharedPreferences(getBaseContext());
+        SSHCheckboxPreference = prefs.getBoolean("ssh_checkbox_preference", true);
+        WebServerCheckboxPreference = prefs.getBoolean("webserver_checkbox_preference", true);
+    }
+
 }
