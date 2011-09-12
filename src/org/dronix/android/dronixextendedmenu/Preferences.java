@@ -1,13 +1,9 @@
 package org.dronix.android.dronixextendedmenu;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
 
 
 public class Preferences extends PreferenceActivity {
@@ -15,41 +11,44 @@ public class Preferences extends PreferenceActivity {
         protected void onCreate(Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 addPreferencesFromResource(R.xml.preferences);
-                // Get the custom preference
-                Preference customPref = (Preference) findPreference("customPref");
-                customPref
-                                .setOnPreferenceClickListener(new OnPreferenceClickListener() {
- 
-                                        public boolean onPreferenceClick(Preference preference) {
-                                                Toast.makeText(getBaseContext(),
-                                                                "The custom preference has been clicked",
-                                                                Toast.LENGTH_LONG).show();
-                                                SharedPreferences customSharedPreference = getSharedPreferences(
-                                                                "myCustomSharedPrefs", Activity.MODE_PRIVATE);
-                                                SharedPreferences.Editor editor = customSharedPreference
-                                                                .edit();
-                                                editor.putString("myCustomPref",
-                                                                "The preference has been clicked");
-                                                editor.commit();
-                                                return true;
-                                        }
- 
-                                });
+/*            // Get the custom preference
+            Preference customPref = (Preference) findPreference("customPref");
+            customPref
+                .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+                    public boolean onPreferenceClick(Preference preference) {
+                        Toast.makeText(getBaseContext(),
+                            "The custom preference has been clicked",
+                            Toast.LENGTH_LONG).show();
+                        SharedPreferences customSharedPreference = getSharedPreferences(
+                            "myCustomSharedPrefs", Activity.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = customSharedPreference
+                            .edit();
+                        editor.putString("myCustomPref",
+                            "The preference has been clicked");
+                        editor.commit();
+                        return true;
+                    }
+
+                });*/
         }
 
-    boolean CheckboxPreference;
-        String ListPreference;
+    boolean SSHCheckboxPreference;
+    boolean WebServerCheckboxPreference;
+
+    String ListPreference;
         String editTextPreference;
         String ringtonePreference;
         String secondEditTextPreference;
         String customPref;
 
         private void getPrefs() {
-                // Get the xml/preferences.xml preferences
-                SharedPreferences prefs = PreferenceManager
-                                .getDefaultSharedPreferences(getBaseContext());
-                CheckboxPreference = prefs.getBoolean("checkboxPref", true);
-                ListPreference = prefs.getString("listPref", "nr1");
+            // Get the xml/preferences.xml preferences
+            SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+            SSHCheckboxPreference = prefs.getBoolean("ssh_checkbox_preference", true);
+            WebServerCheckboxPreference = prefs.getBoolean("webserver_checkbox_preference", true);
+/*                ListPreference = prefs.getString("listPref", "nr1");
                 editTextPreference = prefs.getString("editTextPref",
                                 "Nothing has been entered");
                 ringtonePreference = prefs.getString("ringtonePref",
@@ -59,6 +58,6 @@ public class Preferences extends PreferenceActivity {
                 // Get the custom preference
                 SharedPreferences mySharedPreferences = getSharedPreferences(
                                 "myCustomSharedPrefs", Activity.MODE_PRIVATE);
-                customPref = mySharedPreferences.getString("myCusomPref", "");
+                customPref = mySharedPreferences.getString("myCusomPref", "");*/
         }
 }

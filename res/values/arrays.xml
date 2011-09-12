@@ -1,4 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="listArray">blablabla</string-array>
-    <string-array name="listValues">pippoplutopaperino</string-array>
+    <string-array name="listArray">
+        <item>Every 1 second</item>
+        <item>Every 5 seconds</item>
+        <item>Every 30 seconds</item>
+        <item>Every 1 minute</item>
+        <item>Every 5 minutes</item>
+    </string-array>
+    <string-array name="listValues">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
+    </string-array>
 </resources>

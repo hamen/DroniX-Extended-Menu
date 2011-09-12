@@ -24,4 +24,7 @@
     <string name="about_menuitem">About</string>
     <string name="exit_menuitem">Exit</string>
     <string name="set_preferences">Set preferences</string>
+
+    <string name="ssh_start_stop">Start or stop SSH server</string>
+    <string name="webserver_start_stop">Start or stop Web server</string>
 </resources>
