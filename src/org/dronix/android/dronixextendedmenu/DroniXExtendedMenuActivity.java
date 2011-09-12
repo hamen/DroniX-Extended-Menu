@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ToggleButton;
 import com.stericson.RootTools.RootToolsException;
 
@@ -120,6 +121,16 @@ public class DroniXExtendedMenuActivity extends Activity {
         }
 
        checkSSH(sshTB);
+
+        Button prefBtn = (Button) findViewById(R.id.prefButton);
+                prefBtn.setOnClickListener(new OnClickListener() {
+
+                        public void onClick(View v) {
+                                Intent settingsActivity = new Intent(getBaseContext(),
+                                                Preferences.class);
+                                startActivity(settingsActivity);
+                        }
+                });
     }
 
     private void checkSSH(ToggleButton b) {

@@ -17,5 +17,9 @@
         <activity android:name=".SSHpasswordChange"
                   android:label="@string/ssh_password_change_menuitem">
         </activity>
+        <activity
+            android:name=".Preferences"
+            android:label="@string/set_preferences">
+        </activity>
     </application>
 </manifest>

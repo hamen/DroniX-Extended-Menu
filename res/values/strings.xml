@@ -23,4 +23,5 @@
     <string name="ssh_password_change_menuitem">Change SSH password</string>
     <string name="about_menuitem">About</string>
     <string name="exit_menuitem">Exit</string>
+    <string name="set_preferences">Set preferences</string>
 </resources>
