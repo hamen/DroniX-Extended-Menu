@@ -1,11 +1,14 @@
 package org.dronix.android.dronixextendedmenu;
 
 import android.content.SharedPreferences;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.text.format.Formatter;
 import android.widget.Toast;
 import com.stericson.RootTools.RootToolsException;
 
@@ -55,6 +58,13 @@ public class Preferences extends PreferenceActivity {
         if (newValue.toString().equals("true") && !SSH.isRunning()) {
             try {
                 ssh.start();
+                String password = SSH.getPassword();
+                String ip = getWIFIip();
+                String connectionData = "username: root\n" +
+                    "password: " + password + "\n" +
+                    "IP: " + ip;
+                String title =   getString(R.string.sshStarted);
+                ssh.showInfos(connectionData, title);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (RootToolsException e) {
@@ -66,6 +76,7 @@ public class Preferences extends PreferenceActivity {
                 Toast.makeText(getApplicationContext(),
                     getText(R.string.sshStarted),
                     Toast.LENGTH_SHORT).show();
+
             }
         }
         else {
@@ -111,5 +122,12 @@ public class Preferences extends PreferenceActivity {
                     Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private String getWIFIip() {
+		WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+		int ipAddress = wifiInfo.getIpAddress();
+		return Formatter.formatIpAddress(ipAddress);
     }
 }
