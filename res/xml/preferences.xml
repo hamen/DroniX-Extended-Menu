@@ -7,6 +7,15 @@
             android:defaultValue="false"
             android:summary="@string/ssh_start_stop"
             android:key="ssh_checkbox_preference" />
+        <Preference
+            android:title="@string/ssh_password_change_menuitem"
+            android:summary="@string/ssh_password_change_menuitem_label"
+            android:key="ssh_password">
+            <intent
+                android:action="android.intent.action.MAIN"
+                android:targetPackage="org.dronix.android.dronixextendedmenu"
+                android:targetClass="org.dronix.android.dronixextendedmenu.SSHpasswordChange" />
+        </Preference>
         <CheckBoxPreference
             android:title="WebServer"
             android:defaultValue="false"

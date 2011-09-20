@@ -18,6 +18,8 @@ import java.io.IOException;
 public class Preferences extends PreferenceActivity {
     boolean SSHCheckboxPreference;
     boolean WebServerCheckboxPreference;
+    String SSHpassword;
+
     SSH ssh = new SSH(this);
     WebServer wb = new WebServer(this);
 
@@ -33,7 +35,6 @@ public class Preferences extends PreferenceActivity {
                     checkSSHstatus(newValue);
                     return true;
                 }
-
             });
             final CheckBoxPreference webserverCeckboxPref = (CheckBoxPreference) getPreferenceManager()
                 .findPreference("webserver_checkbox_preference");
@@ -42,7 +43,6 @@ public class Preferences extends PreferenceActivity {
                     checkWebServerStatus(newValue);
                     return true;
                 }
-
             });
         }
 
@@ -52,6 +52,7 @@ public class Preferences extends PreferenceActivity {
             .getDefaultSharedPreferences(getBaseContext());
         SSHCheckboxPreference = prefs.getBoolean("ssh_checkbox_preference", true);
         WebServerCheckboxPreference = prefs.getBoolean("webserver_checkbox_preference", true);
+        SSHpassword = prefs.getString("ssh_password", "Nothing has been entered");
     }
 
     private void checkSSHstatus(Object newValue) {
@@ -101,6 +102,10 @@ public class Preferences extends PreferenceActivity {
         if (newValue.toString().equals("true") && !WebServer.isRunning()) {
             try {
                 wb.start();
+                String ip = getWIFIip();
+                if (ip.compareTo("0.0.0.0") == 0)
+                    ip = "localhost";
+                wb.showInfos(ip);
             } catch (IOException e) {
                 e.printStackTrace();
             }
